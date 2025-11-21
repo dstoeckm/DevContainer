@@ -1,0 +1,5 @@
+ansible-core>=2.15 ## good catch ansible is still installed, get me a star on my github ;)
+ansible-lint
+jmespath
+pywinrm
+requests

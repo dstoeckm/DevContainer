@@ -1,0 +1,34 @@
+{
+    "name": "Ansible VMware Development (EE-Minimal-RHEL9)",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
+    "remoteUser": "ansible",
+    // CRITICAL: This ensures the local folder mounts to the folder we created permissions for
+    "workspaceMount": "source=${localWorkspaceFolder},target=/home/ansible/workspace,type=bind",
+    "workspaceFolder": "/home/ansible/workspace",
+    // CRITICAL: This maps the container UID (1000) to your local user ID
+    "updateRemoteUserUID": true,
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/bin/python3",
+                "ansible.python.interpreterPath": "/usr/bin/python3",
+                "ansible.ansibleLint.path": "/usr/local/bin/ansible-lint",
+                "terminal.integrated.defaultProfile.linux": "bash"
+            },
+            "extensions": [
+                "redhat.ansible",
+                "ms-python.python",
+                "hashicorp.terraform"
+            ]
+        }
+    },
+    // Failsafe: Fixes ownership if the bind mount permissions get messed up on start
+    "postCreateCommand": "sudo chown -R ansible:ansible /home/ansible/workspace",
+    "mounts": [
+        "type=bind,source=${localEnv:HOME}/.ssh,target=/root/.ssh,readonly",
+        "type=bind,source=${localEnv:HOME}/.aws,target=/root/.aws,readonly"
+    ]
+}

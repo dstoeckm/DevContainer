@@ -1,0 +1,6 @@
+ansible-core>=2.15
+ansible-lint
+jmespath
+pywinrm
+requests
+PyVmomi
