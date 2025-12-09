@@ -48,8 +48,9 @@ RUN groupadd --gid $USER_GID $USERNAME || echo "Group exists" && \
     chmod 0440 /etc/sudoers.d/$USERNAME
 
 # 4. Create Directories with correct ownership
-RUN mkdir -p /home/$USERNAME/.ansible && \
-    mkdir -p /home/$USERNAME/workspace && \
+RUN mkdir -p /home/$USERNAME/.ansible \
+             /home/$USERNAME/.ssh \
+             /home/$USERNAME/workspace && \
     chown -R $USER_UID:$USER_GID /home/$USERNAME
 
 # 5. Install Python Dependencies

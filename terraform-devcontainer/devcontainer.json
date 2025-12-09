@@ -1,34 +1,44 @@
 {
-    "name": "Ansible VMware Development (EE-Minimal-RHEL9)",
+    "name": "Terraform Development (EE-Minimal-RHEL10)",
     "build": {
         "dockerfile": "Dockerfile",
-        "context": "."
+        "context": ".",
+        "args": {
+            "TERRAFORM_VERSION": "1.13.5"
+        }
     },
     "remoteUser": "ansible",
-    // CRITICAL: This ensures the local folder mounts to the folder we created permissions for
+    "updateRemoteUserUID": true,
     "workspaceMount": "source=${localWorkspaceFolder},target=/home/ansible/workspace,type=bind",
     "workspaceFolder": "/home/ansible/workspace",
-    // CRITICAL: This maps the container UID (1000) to your local user ID
-    "updateRemoteUserUID": true,
+    "mounts": [
+        "source=${env:HOME}/.ssh/id_rsa,target=/home/ansible/.ssh/id_rsa,type=bind,readonly",
+        "source=${env:HOME}/.ssh/id_rsa.pub,target=/home/ansible/.ssh/id_rsa.pub,type=bind,readonly",
+        "source=${env:HOME}/.ssh/known_hosts,target=/home/ansible/.ssh/known_hosts,type=bind"
+    ],
+    "runArgs": [],
+    "postCreateCommand": "bash -c 'sudo chown -R ansible:ansible /home/ansible/workspace && mkdir -p ~/.ssh && chmod 700 ~/.ssh && touch ~/.ssh/config 2>/dev/null || true && chmod 600 ~/.ssh/config 2>/dev/null || true'",
     "customizations": {
         "vscode": {
             "settings": {
                 "python.defaultInterpreterPath": "/usr/bin/python3",
                 "ansible.python.interpreterPath": "/usr/bin/python3",
                 "ansible.ansibleLint.path": "/usr/local/bin/ansible-lint",
-                "terminal.integrated.defaultProfile.linux": "bash"
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "ansible.ansible.path": "/usr/local/bin/ansible",
+                "ansible.executionEnvironment.enabled": false
             },
             "extensions": [
                 "redhat.ansible",
+                "hashicorp.terraform",
                 "ms-python.python",
-                "hashicorp.terraform"
+                "redhat.vscode-yaml"
             ]
         }
     },
-    // Failsafe: Fixes ownership if the bind mount permissions get messed up on start
-    "postCreateCommand": "sudo chown -R ansible:ansible /home/ansible/workspace",
-    "mounts": [
-        "type=bind,source=${localEnv:HOME}/.ssh,target=/root/.ssh,readonly",
-        "type=bind,source=${localEnv:HOME}/.aws,target=/root/.aws,readonly"
-    ]
+    "remoteEnv": {
+        "SSH_AUTH_SOCK": "/ssh-agent",
+        "ANSIBLE_HOST_KEY_CHECKING": "False",
+        "TERRAFORM_VERSION": "1.14.0"
+    }
 }
